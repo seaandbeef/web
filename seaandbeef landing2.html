@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SeaandBeef a drop based food program</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg: #fbfaf7;
+      --panel: rgba(255,255,255,.78);
+      --panel-2: rgba(255,255,255,.62);
+      --text: #121413;
+      --muted: #5f6662;
+      --hairline: rgba(18,20,19,.10);
+      --shadow: 0 18px 60px rgba(0,0,0,.14);
+
+      --accent: #2f6b3e;
+      --accent-2:#c47a3a;
+      --dark: #0f1412;
+
+      --radius-xl: 28px;
+      --radius-lg: 22px;
+      --radius-md: 16px;
+
+      --max: 1180px;
+    }
+
+    *{ box-sizing:border-box; }
+    html{ scroll-behavior:smooth; }
+    body{
+      margin:0;
+      color:var(--text);
+      background: var(--bg);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      line-height:1.5;
+    }
+    a{ color:inherit; text-decoration:none; }
+    img{ max-width:100%; display:block; }
+
+    .container{ width:min(var(--max), calc(100% - 48px)); margin-inline:auto; }
+    .muted{ color:var(--muted); }
+    .kicker{
+      display:inline-flex; align-items:center; gap:10px;
+      font-weight:600; font-size:12px; letter-spacing:.18em; text-transform:uppercase;
+      color:rgba(18,20,19,.72);
+    }
+    .kicker:before{
+      content:""; width:34px; height:1px; background:rgba(18,20,19,.22);
+      display:inline-block;
+    }
+
+    /* Top nav (pill) — FIXED: smaller height + subtle glow */
+    .topbar-wrap{
+      position:sticky; top:14px; z-index:50;
+      padding: 0 0 10px 0;
+    }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:14px;
+
+      /* smaller pill */
+      padding: 9px 12px;
+      min-height: 52px;
+
+      border:1px solid rgba(255,255,255,.26);
+      background: rgba(15,20,18,.58);
+      backdrop-filter: blur(12px);
+      border-radius: 999px;
+
+      /* subtle glow + depth */
+      box-shadow:
+        0 10px 34px rgba(0,0,0,.18),
+        0 0 0 1px rgba(47,107,62,.10),
+        0 0 28px rgba(47,107,62,.16);
+    }
+
+    .brand{
+      display:flex; align-items:center;
+      padding-left: 6px;
+    }
+    .brand-logo{
+      height: 38px;     /* smaller logo so pill feels tighter */
+      width: auto;
+      display:block;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,.25));
+    }
+
+    .navlinks{
+      display:none;
+      align-items:center; gap:16px;
+      color: rgba(243,245,244,.86);
+      font-weight:550;
+      font-size:13.5px;
+    }
+    .navlinks a{ opacity:.88; }
+    .navlinks a:hover{ opacity:1; }
+    .nav-cta{
+      display:flex; align-items:center; gap:8px;
+    }
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      padding: 9px 12px;                 /* smaller buttons */
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.20);
+      background: rgba(255,255,255,.08);
+      color: #f3f5f4;
+      font-weight:650;
+      font-size:13.5px;
+      line-height: 1;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      white-space:nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.12); }
+    .btn.primary{
+      background: linear-gradient(135deg, #2f6b3e, #1f4d2a);
+      border-color: rgba(255,255,255,.10);
+    }
+    .btn.primary:hover{ background: linear-gradient(135deg, #2a6138, #1a4324); }
+
+    /* Sections */
+    section{ padding: 68px 0; }
+    .section-title{
+      font-family: "Playfair Display", serif;
+      font-weight: 650;
+      font-size: clamp(28px, 3.2vw, 44px);
+      letter-spacing: -0.02em;
+      margin: 10px 0 12px;
+    }
+
+    .split{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 28px;
+      align-items:center;
+    }
+
+    /* Feature strip */
+    .feature-row{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-top: 18px;
+    }
+    .feature{
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid var(--hairline);
+      background: rgba(255,255,255,.70);
+      box-shadow: 0 10px 30px rgba(0,0,0,.06);
+    }
+    .feature h3{
+      margin: 0 0 8px;
+      font-size: 14.5px;
+      letter-spacing: -0.01em;
+    }
+    .feature p{ margin:0; color: var(--muted); font-size: 13.5px; }
+
+    /* Drops tiles */
+    .tile-row{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 22px;
+    }
+    .tile{
+      border-radius: var(--radius-lg);
+      overflow:hidden;
+      border:1px solid var(--hairline);
+      background: rgba(255,255,255,.76);
+      box-shadow: 0 16px 44px rgba(0,0,0,.08);
+    }
+    .tile .thumb{
+      position:relative;
+      height: 220px;
+      background-size: cover;
+      background-position: center;
+    }
+    .tile .thumb:after{
+      content:"";
+      position:absolute; inset:0;
+      background: radial-gradient(450px 260px at 50% 20%, rgba(255,255,255,.05), rgba(0,0,0,.30));
+      pointer-events:none;
+    }
+    .tile .thumb .tag{
+      position:absolute; left:14px; top:14px;
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.20);
+      color: rgba(255,255,255,.92);
+      background: rgba(0,0,0,.22);
+      font-size: 12px;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+      z-index:1;
+    }
+    .tile .body{ padding: 16px 16px 18px; }
+    .tile h3{
+      margin:0 0 8px;
+      font-size: 16px;
+      letter-spacing: -0.01em;
+    }
+    .tile p{
+      margin:0 0 12px;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+    .tile .link{
+      display:inline-flex; align-items:center; gap:8px;
+      font-weight: 650; font-size: 13.5px;
+      color: var(--accent);
+    }
+    .tile .link svg{ width:16px; height:16px; }
+
+    /* Drop calendar */
+    .calendar{
+      margin-top: 24px;
+      border-radius: var(--radius-xl);
+      border:1px solid var(--hairline);
+      background: rgba(255,255,255,.74);
+      overflow:hidden;
+      box-shadow: 0 16px 44px rgba(0,0,0,.08);
+    }
+    .cal-row{
+      display:grid;
+      grid-template-columns: 140px 1fr;
+      gap: 18px;
+      padding: 24px;
+      border-top: 1px solid var(--hairline);
+    }
+    .cal-row:first-child{ border-top:none; }
+    .cal-num{
+      font-family: "Playfair Display", serif;
+      font-size: 38px;
+      color: rgba(18,20,19,.42);
+      line-height:1;
+      padding-top: 4px;
+    }
+    .cal-main h4{
+      margin:0 0 6px;
+      font-size: 18px;
+      letter-spacing: -0.01em;
+    }
+    .meta{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin: 10px 0 0;
+    }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--hairline);
+      background: rgba(255,255,255,.62);
+      color: rgba(18,20,19,.86);
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+    .chip strong{ font-weight: 750; }
+    .chip.upcoming{
+      border-color: rgba(47,107,62,.25);
+      background: rgba(47,107,62,.08);
+      color: #214f2d;
+    }
+
+    details{
+      margin-top: 12px;
+      border: 1px solid var(--hairline);
+      border-radius: 14px;
+      background: rgba(255,255,255,.62);
+      overflow:hidden;
+    }
+    summary{
+      cursor:pointer;
+      list-style:none;
+      padding: 12px 12px;
+      font-weight:650;
+      font-size: 13.5px;
+      color: rgba(18,20,19,.88);
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px;
+    }
+    summary::-webkit-details-marker{ display:none; }
+    summary .caret{
+      width: 26px; height: 26px;
+      border-radius: 999px;
+      display:grid; place-items:center;
+      border: 1px solid var(--hairline);
+      background: rgba(255,255,255,.66);
+    }
+    details[open] summary .caret{ transform: rotate(180deg); }
+    details .content{
+      padding: 0 12px 12px;
+      color: var(--muted);
+      font-size: 13.5px;
+    }
+
+    /* Form */
+    .form-wrap{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+      margin-top: 18px;
+    }
+    label{
+      display:block;
+      font-size: 12.5px;
+      font-weight: 650;
+      color: rgba(18,20,19,.80);
+      margin-bottom: 8px;
+    }
+    input, select, textarea{
+      width:100%;
+      border: 1px solid var(--hairline);
+      background: rgba(255,255,255,.82);
+      border-radius: 14px;
+      padding: 12px 12px;
+      font: inherit;
+      outline:none;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color: rgba(47,107,62,.35);
+      box-shadow: 0 0 0 4px rgba(47,107,62,.10);
+    }
+    textarea{ min-height: 110px; resize: vertical; }
+    .full{ grid-column: 1 / -1; }
+
+    /* Footer (fixed) + LOGO */
+    footer{
+      padding: 40px 0 34px;
+      border-top: 1px solid rgba(18,20,19,.10);
+      background: rgba(255,255,255,.55);
+    }
+    .footer-grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+      align-items:start;
+    }
+    .footer-brand{
+      display:flex; align-items:center; gap:12px;
+      font-weight: 750;
+      letter-spacing: .01em;
+      color: rgba(18,20,19,.92);
+    }
+    .footer-logo{
+      height: 30px;
+      width: auto;
+      display:block;
+    }
+    .fineprint{
+      margin-top: 10px;
+      color: rgba(18,20,19,.66);
+      font-size: 12.5px;
+      line-height: 1.6;
+      max-width: 560px;
+    }
+    .footer-links{
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
+      align-items:flex-start;
+    }
+    .linkbtn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:flex-start;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(18,20,19,.10);
+      background: rgba(255,255,255,.70);
+      font-weight: 650;
+      font-size: 13px;
+      color: rgba(18,20,19,.88);
+      cursor: pointer;
+    }
+    .linkbtn:hover{ background: rgba(255,255,255,.88); }
+
+    /* Modal */
+    .modal-overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.46);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+      z-index: 80;
+    }
+    .modal-overlay.open{ display:flex; }
+    .modal{
+      width: min(920px, 100%);
+      max-height: min(82vh, 900px);
+      overflow:auto;
+      border-radius: 22px;
+      background: rgba(255,255,255,.96);
+      border: 1px solid rgba(18,20,19,.10);
+      box-shadow: 0 22px 80px rgba(0,0,0,.24);
+      outline: none;
+    }
+    .modal-head{
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,.94);
+      border-bottom: 1px solid rgba(18,20,19,.10);
+      padding: 16px 16px;
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap: 10px;
+    }
+    .modal-title{
+      margin:0;
+      font-family: "Playfair Display", serif;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      font-size: 22px;
+      color: rgba(18,20,19,.92);
+    }
+    .modal-close{
+      border: 1px solid rgba(18,20,19,.10);
+      background: rgba(255,255,255,.86);
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-weight: 750;
+      cursor: pointer;
+    }
+    .modal-close:hover{ background: rgba(255,255,255,.96); }
+    .modal-body{
+      padding: 16px 18px 20px;
+      color: rgba(18,20,19,.86);
+      font-size: 13.5px;
+      line-height: 1.7;
+    }
+    .modal-body h3{
+      margin: 16px 0 8px;
+      font-size: 14.5px;
+      letter-spacing: -0.01em;
+    }
+    .modal-body ul{ margin: 8px 0 0 18px; }
+    .divider{
+      height:1px;
+      background: rgba(18,20,19,.10);
+      margin: 14px 0;
+    }
+
+    /* NEW HERO (scoped) */
+    .sb-hero{
+      padding: 34px 0 52px;
+      background: #fbfaf7;
+    }
+    .sb-hero-wrap{
+      width: min(1400px, 92vw);
+      margin: 0 auto;
+      position: relative;
+      border-radius: 28px;
+      padding: 68px 22px 44px;
+    }
+    .sb-corner{
+      position:absolute;
+      width: clamp(120px, 14vw, 220px);
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      border-radius: 18px;
+      border: 1px solid rgba(18,20,19,.10);
+      box-shadow: 0 18px 60px rgba(0,0,0,.12);
+      opacity: .98;
+    }
+    .sb-corner-left{
+      left: -36px;
+      top: 44px;
+      transform: rotate(-12deg);
+    }
+    .sb-corner-right{
+      right: -36px;
+      top: 44px;
+      transform: rotate(12deg);
+    }
+    .sb-hero-center{
+      text-align:center;
+      max-width: 920px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 2;
+    }
+    .sb-kicker{
+      font-size: 12px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: rgba(18,20,19,.65);
+    }
+    .sb-title{
+      margin: 18px 0 14px;
+      font-family: "Playfair Display", serif;
+      font-weight: 650;
+      letter-spacing: -0.02em;
+      line-height: 1.07;
+      color: rgba(18,20,19,.92);
+      font-size: clamp(38px, 4.6vw, 66px);
+    }
+    .sb-subtitle{
+      margin: 0 auto;
+      max-width: 760px;
+      color: rgba(18,20,19,.62);
+      font-size: 15.5px;
+      line-height: 1.65;
+    }
+    .sb-cta-row{
+      margin-top: 18px;
+      display:flex;
+      justify-content:center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .sb-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 12px 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      border: 1px solid rgba(18,20,19,.12);
+      text-decoration:none;
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+      white-space: nowrap;
+    }
+    .sb-btn:hover{ transform: translateY(-1px); }
+    .sb-btn-primary{
+      background: linear-gradient(135deg, #2f6b3e, #1f4d2a);
+      border-color: rgba(0,0,0,.08);
+      color: #fff;
+    }
+    .sb-btn-primary:hover{ background: linear-gradient(135deg, #2a6138, #1a4324); }
+    .sb-btn-ghost{
+      background: rgba(255,255,255,.82);
+      color: rgba(18,20,19,.92);
+    }
+    .sb-btn-ghost:hover{ background: rgba(255,255,255,.92); }
+
+    .sb-main-photo{
+      margin-top: 22px;
+      border-radius: 22px;
+      overflow:hidden;
+      border: 1px solid rgba(18,20,19,.10);
+      box-shadow: 0 18px 70px rgba(0,0,0,.14);
+      background: rgba(255,255,255,.70);
+    }
+    .sb-main-photo img{
+      width:100%;
+      height: min(420px, 46vw);
+      object-fit: cover;
+      display:block;
+    }
+
+    /* Program layout */
+    .program-wrap{ padding: 28px 0; }
+    .program-left{ padding: 4px 0; }
+    .program-photo{
+      border-radius: var(--radius-lg);
+      overflow:hidden;
+      border:1px solid rgba(18,20,19,.10);
+      box-shadow: 0 16px 44px rgba(0,0,0,.10);
+      min-height: 420px;
+      background-size: cover;
+      background-position: center;
+    }
+
+    @media (min-width: 920px){
+      .navlinks{ display:flex; }
+    }
+    @media (max-width: 980px){
+      .split{ grid-template-columns: 1fr; }
+      .feature-row{ grid-template-columns: 1fr; }
+      .tile-row{ grid-template-columns: 1fr; }
+      .cal-row{ grid-template-columns: 90px 1fr; }
+      .form-wrap{ grid-template-columns: 1fr; }
+      .footer-grid{ grid-template-columns: 1fr; }
+      .sb-corner{ display:none; }
+      .sb-hero-wrap{ padding: 56px 16px 40px; }
+      .program-photo{ min-height: 320px; }
+    }
+    @media (max-width: 560px){
+      .topbar{ padding: 9px 10px; min-height: 50px; }
+      .btn{ padding: 9px 10px; }
+      .container{ width: min(var(--max), calc(100% - 28px)); }
+      section{ padding: 56px 0; }
+      .brand-logo{ height: 26px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Top pill nav -->
+  <div class="topbar-wrap">
+    <div class="container">
+      <div class="topbar" role="navigation" aria-label="Primary">
+
+        <a class="brand" href="#top" aria-label="SeaandBeef home">
+          <img src="sblogo.png" alt="SeaandBeef Logo" class="brand-logo">
+        </a>
+
+        <div class="navlinks" aria-label="Site links">
+          <a href="#program">Program</a>
+          <a href="#featured">Featured Drops</a>
+          <a href="#calendar">Drop Calendar</a>
+          <a href="#join">Join</a>
+        </div>
+
+        <div class="nav-cta">
+          <a class="btn" href="#calendar">View Drops</a>
+          <a class="btn primary" href="#join">Get Access</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <section class="sb-hero" id="top" aria-label="Hero">
+    <div class="sb-hero-wrap">
+      <img class="sb-corner sb-corner-left"  src="wagyua5hero.jpg" alt="SeaandBeef drop prep" />
+      <img class="sb-corner sb-corner-right" src="otoro.png" alt="Premium otoro" />
+
+      <div class="sb-hero-center">
+        <div class="sb-kicker">The drop model for premium meat and seafood.</div>
+
+        <h1 class="sb-title">
+          Seafood & Beef<br/>
+          at wholesale scale.
+        </h1>
+
+        <p class="sb-subtitle">
+          SeaandBeef is a drop program where members buy together to unlock wholesale pricing on exceptional
+          sourcing Australian Wagyu from top farms, true Japanese A5 selections, and premium seafood like bluefin otoro,
+          Hokkaido scallops, and king crab. Limited windows. Clean fulfillment. No clutter.
+        </p>
+
+        <div class="sb-cta-row">
+          <a class="sb-btn sb-btn-primary" href="#join">Join the next drop</a>
+          <a class="sb-btn sb-btn-ghost" href="#calendar">View drop calendar</a>
+        </div>
+
+        <div class="sb-main-photo" aria-label="Main hero photo">
+          <img src="mainhero.png" alt="SeaandBeef hero image" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRAM / INFO -->
+  <section id="program" aria-label="Program">
+    <div class="container program-wrap">
+      <div class="split">
+        <div class="program-left">
+          <div class="kicker">The program</div>
+          <div class="section-title">Drops, shares, and uncompromising sourcing.</div>
+          <p class="muted" style="margin:0 0 14px;">
+            SeaandBeef runs scheduled drops. Each drop features a single headline cut (or seafood set) with a clear
+            MOQ. For example: 5 lb. Once the drop fills, we fulfill as one
+            high-volume order and pass the efficiency back to members.
+          </p>
+
+          <div class="feature-row" role="list" aria-label="How it works highlights">
+            <div class="feature" role="listitem">
+              <h3>1) Reserve your share</h3>
+              <p>Choose your quantity and pickup or delivery preference during the drop window.</p>
+            </div>
+            <div class="feature" role="listitem">
+              <h3>2) Drop fills as a group</h3>
+              <p>Community buying unlocks pricing that usually only exists at wholesale volumes.</p>
+            </div>
+            <div class="feature" role="listitem">
+              <h3>3) Packed, chilled, delivered</h3>
+              <p>Cold-chain handling with clean packaging and clear pickup instructions.</p>
+            </div>
+          </div>
+
+          <details>
+            <summary>
+              Is this a subscription?
+              <span class="caret" aria-hidden="true">▾</span>
+            </summary>
+            <div class="content">
+              No. You can join any drop you want. Drops are scheduled and limited — you opt in per drop.
+            </div>
+          </details>
+        </div>
+
+        <div class="program-photo" role="img" aria-label="Program photo"
+             style="background-image:
+               linear-gradient(180deg, rgba(0,0,0,.06), rgba(0,0,0,.18)),
+               url('surfandturf.jpg');">
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED DROPS -->
+  <section id="featured" aria-label="Featured drops">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="kicker">Featured drops</div>
+        <div class="section-title">Three drops coming soon.</div>
+        <div class="muted" style="max-width:760px; margin:0 auto;">
+          Keeping it focused, and the best price comes from the group filling the drop.
+        </div>
+      </div>
+
+      <div class="tile-row" role="list">
+        <article class="tile" role="listitem">
+          <div class="thumb" style="background-image:url('wagyua5main.avif');">
+          </div>
+          <div class="body">
+            <h3>Australian Wagyu Ribeye</h3>
+            <p>High marbling, clean trim, cut-spec consistency. Built for the grill.</p>
+            <a class="link" href="#calendar">
+              See the calendar
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13 5l7 7-7 7-1.4-1.4L16.2 13H4v-2h12.2l-4.6-4.6z"/></svg>
+            </a>
+          </div>
+        </article>
+
+        <article class="tile" role="listitem">
+          <div class="thumb" style="background-image:url('wagyua5hero.jpg');">
+          </div>
+          <div class="body">
+            <h3>Japanese A5 New York Strip</h3>
+            <p>NYC A5 striploin is intensely marbled, buttery-rich, and melts effortlessly with a deep, clean umami finish.</p>
+            <a class="link" href="#calendar">
+              See the calendar
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13 5l7 7-7 7-1.4-1.4L16.2 13H4v-2h12.2l-4.6-4.6z"/></svg>
+            </a>
+          </div>
+        </article>
+
+        <article class="tile" role="listitem">
+          <div class="thumb" style="background-image:url('otoro.png');">
+          </div>
+          <div class="body">
+            <h3>Bluefin Otoro</h3>
+            <p>Japanese bluefin otoro is luxuriously fatty, silk-soft in texture, and delivers a clean, ocean-sweet richness that dissolves on the palate.</p>
+            <a class="link" href="#calendar">
+              See the calendar
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M13 5l7 7-7 7-1.4-1.4L16.2 13H4v-2h12.2l-4.6-4.6z"/></svg>
+            </a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- DROP CALENDAR -->
+  <section id="calendar" aria-label="Drop calendar">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="kicker">Drop calendar</div>
+        <div class="section-title">Upcoming drops, cuts, and dates.</div>
+      </div>
+
+      <div class="calendar" role="list" aria-label="Upcoming drops list">
+        <div class="cal-row" role="listitem">
+          <div class="cal-num">01</div>
+          <div class="cal-main">
+            <h4>Australian Wagyu Ribeye Drop</h4>
+            <div class="muted">
+              Stone Axe or Margaret River: Ribeye BMS 9+. Target total: 500 lb. MOQ: 15 lb.
+            </div>
+
+            <div class="meta" aria-label="Drop meta">
+              <span class="chip upcoming"><strong>Upcoming</strong></span>
+              <span class="chip"><strong>Date:</strong> Mar 28, 2026</span>
+              <span class="chip"><strong>Pricing:</strong> $30/lb</span>
+              <span class="chip"><strong>MOQ:</strong> 15 lb</span>
+            </div>
+
+            <details>
+              <summary>
+                What’s included + handling notes
+                <span class="caret" aria-hidden="true">▾</span>
+              </summary>
+              <div class="content">
+                Trim spec: clean ribeye with consistent cap. Packed chilled and sealed. Pickup and delivery options
+                listed at checkout. Final origin are posted when the drop goes live.
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="cal-row" role="listitem">
+          <div class="cal-num">02</div>
+          <div class="cal-main">
+            <h4>Japanese A5 Striploin</h4>
+            <div class="muted">
+              New York Strip. BMS 12. Target total: 700 lb. MOQ: 10 lb.
+            </div>
+
+            <div class="meta">
+              <span class="chip upcoming"><strong>Upcoming</strong></span>
+              <span class="chip"><strong>Date:</strong> Mar 28, 2026</span>
+              <span class="chip"><strong>Pricing:</strong> $55/lb</span>
+              <span class="chip"><strong>MOQ:</strong> 10 lb</span>
+            </div>
+
+            <details>
+              <summary>
+                What’s included + handling notes
+                <span class="caret" aria-hidden="true">▾</span>
+              </summary>
+              <div class="content">
+                Best seared hot and fast. We recommend portioning and freezing immediately if not cooking within 48 hours.
+                The checkout includes origin.
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="cal-row" role="listitem">
+          <div class="cal-num">03</div>
+          <div class="cal-main">
+            <h4>Bluefin Otoro</h4>
+            <div class="muted">
+              Bluefin Otoro. Highest grade. Target total: 400 lb. MOQ: 20 lb.
+            </div>
+
+            <div class="meta">
+              <span class="chip upcoming"><strong>Upcoming</strong></span>
+              <span class="chip"><strong>Date:</strong> Apr 09, 2026</span>
+              <span class="chip"><strong>Pricing:</strong> $18/lb</span>
+              <span class="chip"><strong>MOQ:</strong> 20 lb</span>
+            </div>
+
+            <details>
+              <summary>
+                What’s included + handling notes
+                <span class="caret" aria-hidden="true">▾</span>
+              </summary>
+              <div class="content">
+                Best served chilled and sliced clean for sashimi or nigiri. Keep refrigerated and consume within 24–48 hours,
+                or freeze immediately to preserve texture and quality. Packed frozen.
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" aria-label="FAQ">
+    <div class="container">
+      <div style="text-align:center;">
+        <div class="kicker">FAQ</div>
+        <div class="section-title">Common questions.</div>
+        <div class="muted" style="max-width:760px; margin:0 auto;">
+          Clear expectations for drops, shares, and fulfillment.
+        </div>
+      </div>
+
+      <div class="split" style="margin-top:22px;">
+        <div>
+          <details open>
+            <summary>
+              How do drops work?
+              <span class="caret" aria-hidden="true">▾</span>
+            </summary>
+            <div class="content">
+              A drop opens for a limited time with a headline cut or seafood set and a total quantity (example: 500 lb).
+              Members reserve shares. When the drop fills, we fulfill the group order and schedule pickup or delivery.
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              What if the drop doesn’t fill?
+              <span class="caret" aria-hidden="true">▾</span>
+            </summary>
+            <div class="content">
+              If a drop doesn’t meet its minimum, it may be extended, adjusted, or canceled. If canceled, you’ll be refunded,
+              depending on your payment flow.
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              Where do you source from?
+              <span class="caret" aria-hidden="true">▾</span>
+            </summary>
+            <div class="content">
+              We curate top-tier beef and seafood suppliers per drop. Examples include elite Australian Wagyu farms and
+              true Japanese A5 programs, plus premium seafood from the best countries. Every drop lists origin, grade, and handling notes.
+            </div>
+          </details>
+        </div>
+
+        <div>
+          <details>
+            <summary>
+              Pickup vs delivery?
+              <span class="caret" aria-hidden="true">▾</span>
+            </summary>
+            <div class="content">
+              Drops specify available fulfillment methods. Pickup includes a time window and location. Delivery includes a delivery zone and
+              scheduled window, with cold-chain packaging.
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              Can I change my share after reserving?
+              <span class="caret" aria-hidden="true">▾</span>
+            </summary>
+            <div class="content">
+              During the drop window, you can request changes depending on availability. After the drop closes, changes may be limited.
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              What about refunds and quality issues?
+              <span class="caret" aria-hidden="true">▾</span>
+            </summary>
+            <div class="content">
+              If there’s an issue, contact us within 24 hours of delivery or pickup with photos and order details.
+              Resolutions may include replacement, store credit, or refund depending on the situation and the drop.
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOIN / FORM -->
+  <section id="join" aria-label="Join the program">
+    <div class="container split">
+      <div>
+        <div class="kicker">Join</div>
+        <div class="section-title">Get early access to drops.</div>
+        <p class="muted" style="margin:0;">
+          Join the list and we’ll notify you when a drop opens. You’ll see the cut, origin, total quantity,
+          share sizes, and pickup or delivery details.
+        </p>
+
+        <form class="form-wrap" onsubmit="event.preventDefault(); alert('Submitted (demo). Wire this to your backend or email tool.');">
+          <div>
+            <label for="name">Full name</label>
+            <input id="name" name="name" type="text" placeholder="Your name" required>
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email" placeholder="you@email.com" required>
+          </div>
+
+          <div>
+            <label for="phone">Phone (optional)</label>
+            <input id="phone" name="phone" type="tel" placeholder="(xxx) xxx-xxxx">
+          </div>
+          <div>
+            <label for="preference">Primary interest</label>
+            <select id="preference" name="preference" required>
+              <option value="" disabled selected>Select one</option>
+              <option>Beef drops (Wagyu, prime, specialty cuts)</option>
+              <option>Seafood drops (otoro, scallops, crab, uni)</option>
+              <option>Both</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="share">Typical share size</label>
+            <select id="share" name="share" required>
+              <option value="" disabled selected>Select one</option>
+              <option>10 lb (starter)</option>
+              <option>20 lb</option>
+              <option>50 lb+</option>
+            </select>
+          </div>
+          <div>
+            <label for="fulfillment">Fulfillment</label>
+            <select id="fulfillment" name="fulfillment" required>
+              <option value="" disabled selected>Select one</option>
+              <option>Pickup</option>
+              <option>Chilled delivery</option>
+              <option>Either</option>
+            </select>
+          </div>
+
+          <div class="full">
+            <label for="notes">Notes (allergies, delivery constraints, cuts you want)</label>
+            <textarea id="notes" name="notes" placeholder="Example: prefer ribeye + striploin, interested in otoro sets, delivery weekends only"></textarea>
+          </div>
+
+          <div class="full" style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button type="submit" class="btn primary" style="border:none; cursor:pointer;">Request early access</button>
+            <a class="btn" href="#calendar" style="background: rgba(18,20,19,.06); color: var(--dark); border-color: rgba(18,20,19,.10);">
+              View drop calendar
+            </a>
+          </div>
+        </form>
+      </div>
+
+      <div class="program-photo" role="img" aria-label="Join section photo" style="
+        background:
+          linear-gradient(180deg, rgba(0,0,0,.06), rgba(0,0,0,.18)),
+          url('join.png');
+        min-height: 520px;
+      "></div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer aria-label="Footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">
+            <img src="sblogo.png" alt="SeaandBeef Logo" class="footer-logo">
+            <span>SeaandBeef</span>
+          </div>
+          <div class="fineprint">
+            Luxury drops and share-based buying for elite beef and seafood. Pricing, availability, grades, and origins vary by drop.
+            Always follow safe food handling and storage practices.
+          </div>
+        </div>
+
+        <div class="footer-links">
+          <a class="linkbtn" href="https://instagram.com/seaandbeef" target="_blank" rel="noopener noreferrer">
+            Instagram: @seaandbeef
+          </a>
+          <button class="linkbtn" type="button" data-open-terms aria-haspopup="dialog" aria-controls="terms-modal">
+            Terms & Conditions
+          </button>
+          <a class="linkbtn" href="#join">Join a drop</a>
+        </div>
+      </div>
+
+      <div class="fineprint" style="margin-top:16px;">
+        © <span id="year"></span> SeaandBeef. All rights reserved.
+      </div>
+    </div>
+  </footer>
+
+  <!-- TERMS MODAL -->
+  <div class="modal-overlay" id="terms-overlay" role="dialog" aria-modal="true" aria-labelledby="terms-title" aria-hidden="true">
+    <div class="modal" id="terms-modal" tabindex="-1">
+      <div class="modal-head">
+        <div>
+          <h2 class="modal-title" id="terms-title">SeaandBeef Terms & Conditions</h2>
+          <div class="muted" style="font-size:12.5px; margin-top:2px;">
+            Effective date: <strong>Replace with your date</strong>
+          </div>
+        </div>
+        <button class="modal-close" type="button" data-close-terms aria-label="Close terms">Close</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="muted" style="font-size:12.5px;">
+          This is a clean starter template. Replace with your real Terms & Conditions reviewed by counsel.
+        </div>
+
+        <div class="divider"></div>
+
+        <h3>1) Program Overview</h3>
+        <ul>
+          <li>SeaandBeef offers limited-time product drops for premium beef and seafood.</li>
+          <li>Members reserve shares during a drop window, subject to availability.</li>
+          <li>Drops may have minimum and maximum quantities and may be adjusted, extended, or canceled.</li>
+        </ul>
+
+        <h3>2) Pricing, Payment, and Taxes</h3>
+        <ul>
+          <li>Prices vary by drop based on sourcing, grade, and availability.</li>
+          <li>Payment timing can be configured as authorization at reservation and capture at close, or immediate capture.</li>
+          <li>Applicable taxes, fees, and delivery charges (if any) are shown at checkout.</li>
+        </ul>
+
+        <h3>3) Fulfillment (Pickup and Delivery)</h3>
+        <ul>
+          <li>Pickup windows and locations are announced per drop.</li>
+          <li>Delivery zones and delivery windows are announced per drop. Cold-chain packaging is used.</li>
+          <li>Late pickup or missed delivery windows may affect product quality and may limit remedies.</li>
+        </ul>
+
+        <h3>4) Substitutions and Weight Variance</h3>
+        <ul>
+          <li>Natural products can vary. Final weights may have minor variance.</li>
+          <li>If substitutions are necessary, they will be disclosed and handled per the drop rules.</li>
+        </ul>
+
+        <h3>5) Quality Issues, Refunds, and Credits</h3>
+        <ul>
+          <li>Report quality issues within 24 hours of delivery or pickup with photos and order details.</li>
+          <li>Resolutions may include replacement, store credit, partial refund, or full refund depending on the issue.</li>
+          <li>Perishable products may have limited refund eligibility if mishandled after fulfillment.</li>
+        </ul>
+
+        <h3>6) Food Safety</h3>
+        <ul>
+          <li>You are responsible for proper refrigeration, freezing, thawing, and cooking.</li>
+          <li>SeaandBeef is not responsible for issues caused by improper storage or handling after fulfillment.</li>
+        </ul>
+
+        <h3>7) Limitation of Liability</h3>
+        <ul>
+          <li>To the maximum extent permitted by law, SeaandBeef’s liability is limited to the amount paid for the affected order.</li>
+          <li>SeaandBeef is not liable for indirect, incidental, or consequential damages.</li>
+        </ul>
+
+        <h3>8) Privacy</h3>
+        <ul>
+          <li>We collect contact and order information to manage drops, fulfill orders, and communicate updates.</li>
+          <li>Replace this section with your actual privacy policy and data handling practices.</li>
+        </ul>
+
+        <h3>9) Contact</h3>
+        <ul>
+          <li>Replace with your support email and phone number.</li>
+          <li>Instagram: @seaandbeef</li>
+        </ul>
+
+        <div class="divider"></div>
+        <div class="muted" style="font-size:12.5px;">
+          By participating in drops, you agree to these Terms & Conditions.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    const overlay = document.getElementById("terms-overlay");
+    const modal = document.getElementById("terms-modal");
+    const openBtn = document.querySelector("[data-open-terms]");
+    const closeBtn = document.querySelector("[data-close-terms]");
+    let lastFocus = null;
+
+    function openTerms(){
+      lastFocus = document.activeElement;
+      overlay.classList.add("open");
+      overlay.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      setTimeout(() => modal.focus(), 0);
+    }
+    function closeTerms(){
+      overlay.classList.remove("open");
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      if(lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
+    }
+
+    openBtn?.addEventListener("click", openTerms);
+    closeBtn?.addEventListener("click", closeTerms);
+
+    overlay.addEventListener("click", (e) => { if(e.target === overlay) closeTerms(); });
+
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Escape" && overlay.classList.contains("open")) closeTerms();
+    });
+
+    overlay.addEventListener("keydown", (e) => {
+      if(e.key !== "Tab") return;
+      const focusables = overlay.querySelectorAll(
+        'a[href], button:not([disabled]), textarea, input, select, [tabindex]:not([tabindex="-1"])'
+      );
+      if(!focusables.length) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if(e.shiftKey && document.activeElement === first){
+        e.preventDefault(); last.focus();
+      } else if(!e.shiftKey && document.activeElement === last){
+        e.preventDefault(); first.focus();
+      }
+    });
+  </script>
+
+</body>
+</html>
